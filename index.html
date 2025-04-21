@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Health</title>
+</head>
+<body>
+    <p>Status: <span id="status">Checking...</span></p>
+    <p id="database"></p>
+    <p id="response-time"></p>
+    <p id="timestamp"></p>
+    <p id="error"></p>
+    <script>
+        const HEALTH_ENDPOINT = 'http://localhost:5000/health';
+        const CHECK_INTERVAL = 300000; // 5 minutes
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(HEALTH_ENDPOINT);
+                const data = await response.json();
+                document.getElementById('status').textContent = data.status;
+                document.getElementById('database').textContent = data.database;
+                document.getElementById('response-time').textContent = data.response_time_ms + ' ms';
+                document.getElementById('timestamp').textContent = data.timestamp;
+                document.getElementById('error').textContent = data.error || '';
+            } catch (err) {
+                document.getElementById('status').textContent = 'ERROR';
+                document.getElementById('database').textContent = '';
+                document.getElementById('response-time').textContent = '';
+                document.getElementById('timestamp').textContent = '';
+                document.getElementById('error').textContent = err.message;
+            }
+        }
+
+        checkHealth();
+        setInterval(checkHealth, CHECK_INTERVAL);
+    </script>
+</body>
+</html>
