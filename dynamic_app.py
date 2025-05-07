@@ -3,10 +3,6 @@ import oracledb
 import os
 import time
 import datetime
-from dotenv import load_dotenv
-
-# Load environment variables from .env file if it exists
-load_dotenv()
 
 app = Flask(__name__)
 
@@ -70,7 +66,7 @@ def check_database_health(db_name):
     """Generic function to check health of a specific database"""
     start_time = time.time()
     config = DB_CONFIGS[db_name]
-    db_identifier = f"{config["host"]}:{config["port"]}/{config["service_name"]}"
+    db_identifier = f"{config['host']}:{config['port']}/{config['service_name']}"
     
     connection = None # Ensure connection is defined in the scope
     try:
@@ -104,14 +100,6 @@ def check_database_health(db_name):
             "response_time_ms": response_time,
             "timestamp": datetime.datetime.now().isoformat()
         }), 503  # Service Unavailable status code
-    finally:
-        # Ensure connection is closed even if errors occurred during query
-        if connection:
-            try:
-                connection.close()
-            except Exception as close_err:
-                # Log closing error if necessary, but don't overwrite original error response
-                print(f"Error closing connection for {db_name}: {close_err}")
 
 # Create dynamic routes for each database
 for db_name in DB_CONFIGS.keys():
@@ -123,6 +111,4 @@ for db_name in DB_CONFIGS.keys():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    # Set debug=False for production environments
-    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
-    app.run(host="0.0.0.0", port=port, debug=debug_mode)
+    app.run(host="0.0.0.0", port=port, debug=False)
